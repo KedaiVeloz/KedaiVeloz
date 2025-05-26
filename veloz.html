@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kedai Veloz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff9f0;
+      }
+
+      /* Loading Screen Styles */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff9f0; /* Or your desired background */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Make sure it's on top */
+        opacity: 1; /* Tambahkan ini untuk kontrol fade */
+        transition: opacity 0.5s ease-out; /* Tambahkan ini untuk transisi fade out */
+      }
+
+      #loading-screen img {
+        margin-bottom: 20px; /* Space between logo and loader */
+      }
+
+      /* From Uiverse.io by aryamitra06 */
+      .loader {
+        display: flex;
+        align-items: center;
+      }
+
+      .bar {
+        display: inline-block;
+        width: 3px;
+        height: 20px;
+        background-color: rgba(139, 69, 19, 0.5); /* Adjusted to match theme */
+        border-radius: 10px;
+        animation: scale-up4 1s linear infinite;
+      }
+
+      .bar:nth-child(2) {
+        height: 35px;
+        margin: 0 5px;
+        animation-delay: 0.25s;
+      }
+
+      .bar:nth-child(3) {
+        animation-delay: 0.5s;
+      }
+
+      @keyframes scale-up4 {
+        20% {
+          background-color: #8b4513; /* Adjusted to match theme */
+          transform: scaleY(1.5);
+        }
+
+        40% {
+          transform: scaleY(1);
+        }
+      }
+      /* End of Loading Screen Styles */
+
+      .hero-section {
+        background: linear-gradient(
+            rgba(245, 222, 179, 0.9),
+            rgba(245, 222, 179, 0.9)
+          ),
+          url("tempat.png");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .product-card {
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex; /* Added for consistent card structure */
+        flex-direction: column; /* Added for consistent card structure */
+      }
+      .product-card .p-6 {
+        /* Ensure padding div takes remaining space */
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(139, 69, 19, 0.15);
+      }
+
+      .nav-link {
+        position: relative;
+      }
+
+      .nav-link:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #8b4513;
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover:after {
+        width: 100%;
+      }
+      .nav-link.active-menu-link:after {
+        /* For menu item on current page */
+        width: 100%;
+      }
+      .nav-link.active-menu-link {
+        color: #8b4513;
+        font-weight: 600;
+      }
+
+      .btn-primary {
+        background-color: #8b4513;
+        transition: all 0.3s ease;
+        border-radius: 50px;
+      }
+
+      .btn-primary:hover {
+        background-color: #a0522d;
+        transform: scale(1.05);
+      }
+
+      .floating-label {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background-color: #fff9f0;
+        padding: 0 10px;
+        font-size: 12px;
+        color: #8b4513;
+      }
+
+      #cartOverlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 400px;
+        height: 100%;
+        background-color: #fff9f0;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #cartOverlay.active {
+        transform: translateX(0);
+      }
+
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background-color: #ffffff;
+      }
+
+      .cart-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #8b4513;
+      }
+
+      #closeCartButton {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #8b4513;
+        cursor: pointer;
+      }
+
+      .cart-body {
+        flex-grow: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+      }
+
+      .cart-item {
+        /* Renamed from cart-item-placeholder */
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0e6d8;
+      }
+      .cart-item img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 1rem;
+      }
+      .cart-item-details h4 {
+        /* For items in cart */
+        font-weight: 600;
+        color: #8b4513;
+        font-size: 0.9rem;
+      }
+      .cart-item-details p {
+        font-size: 0.8rem;
+        color: #a0522d;
+      }
+
+      .cart-empty-message {
+        text-align: center;
+        color: #8b4513;
+        margin-top: 2rem;
+      }
+
+      .cart-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background-color: #ffffff;
+      }
+
+      .cart-subtotal {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #8b4513;
+        margin-bottom: 1rem;
+      }
+
+      .btn-checkout {
+        background-color: #8b4513;
+        color: white;
+        width: 100%;
+        padding: 0.75rem;
+        text-align: center;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-checkout:hover {
+        background-color: #a0522d;
+      }
+
+      @media (min-width: 768px) {
+        #cartOverlay {
+          width: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-screen">
+      <img src="logoveloz.png" alt="Kedai Veloz Loading" class="h-24" />
+      <div class="loader">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center">
+            <a href="veloz.html" class="flex items-center">
+              <img
+                src="logoveloz.png"
+                alt="Kedai Veloz Logo"
+                class="h-10 mr-3"
+              />
+              <h1 class="text-xl font-bold text-[#8B4513]">Kedai Veloz</h1>
+            </a>
+          </div>
+
+          <nav class="hidden md:flex space-x-8 items-center">
+            <a
+              href="#home"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Home</a
+            >
+            <a
+              href="#menu"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Menu</a
+            >
+            <a
+              href="#about"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Tentang</a
+            >
+            <button class="btn-primary text-white px-6 py-2 ml-4 btn-pesan">
+              <i class="fas fa-shopping-bag mr-2"></i>Pesan
+            </button>
+          </nav>
+
+          <button
+            class="md:hidden text-gray-700 text-2xl"
+            id="mobileMenuButton"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section id="home" class="hero-section py-20">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-10 md:mb-0">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#8B4513] mb-6">
+              Bakso Pedas Autentik
+            </h1>
+            <p class="text-lg text-gray-700 mb-8">
+              Cita rasa bakso pedas yang menggugah selera
+            </p>
+            <div class="flex space-x-4">
+              <a
+                href="menu-lengkap.html"
+                class="btn-primary px-8 py-3 text-white font-semibold inline-block"
+              >
+                <i class="fas fa-utensils mr-2"></i>Lihat Menu
+              </a>
+            </div>
+          </div>
+          <div class="md:w-1/2 flex justify-center">
+            <img
+              src="heroes.png"
+              alt="Bakso Veloz"
+              class="rounded-lg shadow-xl max-h-96 object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="menu" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-[#8B4513] mb-4">Menu Populer</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">
+            Reccomended untuk orang yang baru pertama kali mencoba menu kami.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod001"
+            data-name="Bakso Kuah Pedas"
+            data-price="8000"
+            data-image="baksopedas.png"
+          >
+            <div class="relative">
+              <img
+                src="baksopedas.png"
+                alt="Bakso Kuah Pedas"
+                class="w-full h-64 object-cover"
+              />
+              <div
+                class="absolute top-4 right-4 bg-[#8B4513] text-white px-3 py-1 rounded-full text-sm font-bold"
+              >
+                BESTSELLER
+              </div>
+            </div>
+            <div class="p-6">
+              <div>
+                <h3 class="text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Pedas
+                </h3>
+                <p class="text-gray-600 mb-4">
+                  Bakso yang diberi kuah pedas dengan bumbu bumbu rahasia kami
+                </p>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-lg font-bold text-[#8B4513]">Rp 8.000</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod002"
+            data-name="Bakso Kuah Biasa"
+            data-price="8000"
+            data-image="tahuputihan.png"
+          >
+            <div class="relative">
+              <img
+                src="tahuputihan.png"
+                alt="Bakso Kuah Biasa"
+                class="w-full h-64 object-cover"
+              />
+            </div>
+            <div class="p-6">
+              <div>
+                <h3 class="text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Biasa
+                </h3>
+                <p class="text-gray-600 mb-4">
+                  Bakso selayaknya bakso pada umumnya dengan bumbu dari kami
+                </p>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-lg font-bold text-[#8B4513]">Rp 8.000</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod011"
+            data-name="Tahu Mercon"
+            data-price="2500"
+            data-image="tahuisi.png"
+          >
+            <div class="relative">
+              <img
+                src="tahuisi.png"
+                alt="Tahu Mercon"
+                class="w-full h-64 object-cover"
+              />
+            </div>
+            <div class="p-6">
+              <div>
+                <h3 class="text-xl font-bold text-[#8B4513] mb-2">
+                  Tahu Mercon
+                </h3>
+                <p class="text-gray-600 mb-4">
+                  Tahu yang digoreng krispi diisi dengan selaian daging ayam
+                </p>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-lg font-bold text-[#8B4513]">Rp 2.500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-12">
+          <a
+            href="menu-lengkap.html"
+            class="border-2 border-[#8B4513] text-[#8B4513] px-8 py-3 rounded-full font-semibold hover:bg-[#8B4513] hover:text-white transition inline-block"
+          >
+            Menu Lengkap <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="py-16 bg-[#F5DEB3]">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+            <img
+              src="tempat.png"
+              alt="Kedai Veloz"
+              class="rounded-lg shadow-xl w-full"
+            />
+          </div>
+          <div class="md:w-1/2">
+            <h2 class="text-3xl font-bold text-[#8B4513] mb-6">
+              Latar Belakang
+            </h2>
+            <p class="text-gray-700 mb-4">
+              Kedai Veloz awal ditemukan oleh seorang ibu bernama Retno
+              Setyowati pada awal tahun 2025 secara tidak sengaja.Awal mula
+              beliau mencoba memasak bakso untuk teman temannya sebagai hidangan
+              di rumahnya.
+            </p>
+            <p class="text-gray-700 mb-6">
+              Lalu beliau mencoba meracik bumbu bumbu improvisasi.lalu terpikir
+              dibenaknya untuk menjadi ide bisnis.
+            </p>
+            <div class="flex space-x-6">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-[#8B4513]">100%</div>
+                <div class="text-gray-700">Bahan baku fresh</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-[#8B4513]">3min</div>
+                <div class="text-gray-700">Penyajian</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-[#8B4513]">24/7</div>
+                <div class="text-gray-700">Customer Support</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-[#8B4513] text-white py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center mb-4">
+              <a href="veloz.html" class="flex items-center">
+                <img
+                  src="logoveloz.png"
+                  alt="Kedai Veloz Logo"
+                  class="h-20 mr-3"
+                />
+                <h3 class="text-xl font-bold">Kedai Veloz</h3>
+              </a>
+            </div>
+            <p class="text-[#F5DEB3]">
+              Cita rasa bakso pedas yang menggugah selera.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Menu Cepat</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#home"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#menu"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Menu</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#about"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Tentang</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Hubungi Kami</h4>
+            <ul class="space-y-2">
+              <li class="flex items-center">
+                <i class="fas fa-map-marker-alt mr-3 text-[#F5DEB3]"></i>
+                <span
+                  >Jl. Raya Sembon No.7, Dusun Sembon, Karangrejo, Kec.
+                  Karangrejo, Kabupaten Tulungagung, Jawa Timur 66253</span
+                >
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-phone-alt mr-3 text-[#F5DEB3]"></i>
+                <span>+6289-8365-4638</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+            <div class="flex space-x-4">
+              <a href="#" class="text-2xl text-[#F5DEB3] hover:text-white">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="text-2xl text-[#F5DEB3] hover:text-white">
+                <i class="fab fa-tiktok"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-[#A0522D] mt-8 pt-8 text-center text-sm text-[#F5DEB3]"
+        >
+          <p>&copy; 2025 Kedai Veloz. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden"
+      id="mobileMenu"
+    >
+      <div class="absolute top-0 right-0 bottom-0 w-3/4 bg-white p-6">
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex items-center">
+            <a href="veloz.html" class="flex items-center">
+              <img
+                src="logoveloz.png"
+                alt="Kedai Veloz Logo"
+                class="h-8 mr-2"
+              />
+              <h3 class="text-lg font-bold text-[#8B4513]">Kedai Veloz</h3>
+            </a>
+          </div>
+          <button id="closeMobileMenu" class="text-2xl text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <nav class="space-y-6 mb-8">
+          <a
+            href="#home"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Home</a
+          >
+          <a
+            href="#menu"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Menu</a
+          >
+          <a
+            href="#about"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Tentang Kami</a
+          >
+        </nav>
+
+        <button
+          class="w-full bg-[#8B4513] text-white py-3 rounded-full font-semibold btn-pesan"
+        >
+          <i class="fas fa-shopping-bag mr-2"></i>Pesan Sekarang
+        </button>
+      </div>
+    </div>
+
+    <div id="cartOverlay">
+      <div class="cart-header">
+        <h3>Keranjang Anda</h3>
+        <button id="closeCartButton"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="cart-body">
+        <div class="cart-empty-message">
+          <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+          <p>Keranjang Anda masih kosong.</p>
+          <p class="text-sm text-gray-500">
+            Silakan tambahkan menu favorit Anda!
+          </p>
+        </div>
+      </div>
+      <div class="cart-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal:</span>
+          <span id="cartOverlaySubtotal">Rp 0</span>
+        </div>
+        <a
+          href="pembayaran.html"
+          id="checkoutLink"
+          class="btn-checkout block text-center"
+        >
+          Lanjut ke Pembayaran <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </div>
+
+    <div
+      id="toastNotification"
+      class="fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-md shadow-lg z-[150]"
+      style="display: none"
+    >
+      Berhasil ditambahkan ke keranjang!
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Loading screen logic
+        const loadingScreen = document.getElementById("loading-screen");
+
+        // Cek apakah loading screen sudah pernah ditampilkan di sesi ini atau ini adalah refresh
+        const isReload =
+          window.performance.navigation.type ===
+          window.performance.navigation.TYPE_RELOAD;
+        const hasLoadedOnceInSession =
+          sessionStorage.getItem("velozLoadingPlayed");
+
+        if (loadingScreen) {
+          // Pastikan elemen loadingScreen ada
+          if (!hasLoadedOnceInSession || isReload) {
+            // Jika ini adalah kunjungan pertama dalam sesi, atau halaman di-refresh
+            loadingScreen.style.opacity = "1";
+            loadingScreen.style.display = "flex"; // Pastikan tampil
+
+            setTimeout(() => {
+              loadingScreen.style.opacity = "0"; // Mulai animasi fade out
+              // Setelah animasi fade out selesai, sembunyikan elemen
+              loadingScreen.addEventListener(
+                "transitionend",
+                function onTransitionEnd() {
+                  loadingScreen.style.display = "none";
+                  loadingScreen.removeEventListener(
+                    "transitionend",
+                    onTransitionEnd
+                  ); // Hapus listener
+                }
+              );
+              // Tandai bahwa loading screen sudah diputar di sesi ini
+              sessionStorage.setItem("velozLoadingPlayed", "true");
+            }, 4000); // Sembunyikan setelah 4 detik (sesuaikan durasi loading Anda)
+          } else {
+            // Jika bukan kunjungan pertama atau refresh (misal, navigasi via back button)
+            loadingScreen.style.display = "none"; // Langsung sembunyikan tanpa animasi
+          }
+        }
+        // End of loading screen logic
+
+        const mobileMenuButton = document.getElementById("mobileMenuButton");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const closeMobileMenuButton =
+          document.getElementById("closeMobileMenu");
+
+        const cartOverlay = document.getElementById("cartOverlay");
+        const openCartButtons = document.querySelectorAll(".btn-pesan");
+        const closeCartButton = document.getElementById("closeCartButton");
+        const cartBody = cartOverlay.querySelector(".cart-body");
+        const cartSubtotalElement = cartOverlay.querySelector(
+          ".cart-subtotal span:last-child"
+        );
+        const cartEmptyMessageOriginal = cartOverlay.querySelector(
+          ".cart-empty-message"
+        );
+
+        const addToCartButtons = document.querySelectorAll(".btn-add-to-cart");
+        const toastNotification = document.getElementById("toastNotification");
+
+        let cartItems = [];
+
+        if (localStorage.getItem("cartItemsVeloz")) {
+          cartItems = JSON.parse(localStorage.getItem("cartItemsVeloz"));
+        }
+
+        function saveCart() {
+          localStorage.setItem("cartItemsVeloz", JSON.stringify(cartItems));
+        }
+
+        if (mobileMenuButton) {
+          mobileMenuButton.addEventListener("click", function () {
+            if (mobileMenu) mobileMenu.classList.remove("hidden");
+          });
+        }
+        if (closeMobileMenuButton) {
+          closeMobileMenuButton.addEventListener("click", function () {
+            if (mobileMenu) mobileMenu.classList.add("hidden");
+          });
+        }
+
+        function openCart() {
+          cartOverlay.classList.add("active");
+          renderCartItems();
+        }
+        function closeCart() {
+          cartOverlay.classList.remove("active");
+        }
+        openCartButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            event.stopPropagation();
+            openCart();
+            if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+              mobileMenu.classList.add("hidden");
+            }
+          });
+        });
+        if (closeCartButton) {
+          closeCartButton.addEventListener("click", closeCart);
+        }
+
+        function showToast(message) {
+          toastNotification.textContent = message;
+          toastNotification.style.display = "block";
+          setTimeout(() => {
+            toastNotification.style.display = "none";
+          }, 2000);
+        }
+
+        addToCartButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const card = this.closest(".product-card");
+            const productId = card.dataset.id;
+            const name = card.dataset.name;
+            const price = parseFloat(card.dataset.price);
+            const image = card.dataset.image;
+
+            addItemToCart(productId, name, price, image);
+            showToast("Berhasil ditambahkan ke keranjang!");
+            openCart();
+          });
+        });
+
+        function addItemToCart(id, name, price, image) {
+          const existingItem = cartItems.find((item) => item.id === id);
+          if (existingItem) {
+            existingItem.quantity++;
+          } else {
+            cartItems.push({ id, name, price, image, quantity: 1 });
+          }
+          saveCart();
+          renderCartItems();
+        }
+
+        function renderCartItems() {
+          cartBody.innerHTML = "";
+
+          if (cartItems.length === 0) {
+            if (cartEmptyMessageOriginal)
+              cartBody.appendChild(cartEmptyMessageOriginal.cloneNode(true));
+          } else {
+            cartItems.forEach((item) => {
+              const itemElement = document.createElement("div");
+              itemElement.classList.add(
+                "cart-item",
+                "flex",
+                "items-center",
+                "py-3",
+                "border-b",
+                "border-gray-200"
+              );
+              itemElement.innerHTML = `
+                        <img src="${item.image}" alt="${
+                item.name
+              }" class="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md mr-3 sm:mr-4">
+                        <div class="flex-grow">
+                            <h4 class="text-sm sm:text-md font-semibold text-[#8B4513]">${
+                              item.name
+                            }</h4>
+                            <p class="text-xs sm:text-sm text-gray-600">Rp ${item.price.toLocaleString(
+                              "id-ID"
+                            )}</p>
+                        </div>
+                        <div class="flex items-center mx-2 sm:mx-3">
+                            <button class="quantity-change bg-gray-200 text-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-l hover:bg-gray-300 text-xs sm:text-sm" data-id="${
+                              item.id
+                            }" data-change="-1">-</button>
+                            <span class="px-2 sm:px-3 text-sm sm:text-md">${
+                              item.quantity
+                            }</span>
+                            <button class="quantity-change bg-gray-200 text-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-r hover:bg-gray-300 text-xs sm:text-sm" data-id="${
+                              item.id
+                            }" data-change="1">+</button>
+                        </div>
+                        <button class="remove-item text-red-500 hover:text-red-700 text-md sm:text-lg" data-id="${
+                          item.id
+                        }">&times;</button>
+                    `;
+              cartBody.appendChild(itemElement);
+            });
+          }
+          updateCartSubtotal();
+          addCartItemEventListeners();
+        }
+
+        function updateCartSubtotal() {
+          const subtotal = cartItems.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+          if (cartSubtotalElement)
+            cartSubtotalElement.textContent = `Rp ${subtotal.toLocaleString(
+              "id-ID"
+            )}`;
+        }
+
+        function addCartItemEventListeners() {
+          cartBody.querySelectorAll(".quantity-change").forEach((button) => {
+            button.addEventListener("click", function () {
+              const itemId = this.dataset.id;
+              const change = parseInt(this.dataset.change);
+              updateItemQuantity(itemId, change);
+            });
+          });
+
+          cartBody.querySelectorAll(".remove-item").forEach((button) => {
+            button.addEventListener("click", function () {
+              const itemId = this.dataset.id;
+              removeItemFromCart(itemId);
+            });
+          });
+        }
+
+        function updateItemQuantity(id, change) {
+          const itemIndex = cartItems.findIndex((item) => item.id === id);
+          if (itemIndex > -1) {
+            cartItems[itemIndex].quantity += change;
+            if (cartItems[itemIndex].quantity <= 0) {
+              cartItems.splice(itemIndex, 1);
+            }
+          }
+          saveCart();
+          renderCartItems();
+        }
+
+        function removeItemFromCart(id) {
+          cartItems = cartItems.filter((item) => item.id !== id);
+          saveCart();
+          renderCartItems();
+        }
+
+        renderCartItems();
+
+        document
+          .querySelectorAll(
+            "a.mobile-nav-link, a.nav-link-footer, nav a.nav-link, .hero-section button"
+          )
+          .forEach((anchor) => {
+            anchor.addEventListener("click", function (e) {
+              const targetHref = this.getAttribute("href");
+              // Check if it's the Lokasi Kami button
+              if (this.innerText.includes("Lokasi Kami")) {
+                const aboutSection = document.getElementById("about");
+                if (aboutSection) {
+                  e.preventDefault();
+                  window.scrollTo({
+                    top: aboutSection.offsetTop - 80,
+                    behavior: "smooth",
+                  });
+                  return; // Exit after handling
+                }
+              }
+
+              const currentPath =
+                window.location.pathname.substring(
+                  window.location.pathname.lastIndexOf("/") + 1
+                ) || "veloz.html";
+
+              if (
+                targetHref &&
+                (targetHref.startsWith("#") ||
+                  (targetHref.includes("#") &&
+                    targetHref.split("#")[0] === currentPath) ||
+                  (targetHref.includes("#") &&
+                    targetHref.split("#")[0] === "" &&
+                    (currentPath === "veloz.html" || currentPath === "")))
+              ) {
+                if (
+                  (currentPath === "veloz.html" || currentPath === "") &&
+                  (targetHref === "#home" ||
+                    targetHref === "#menu" ||
+                    targetHref === "#about")
+                ) {
+                  e.preventDefault();
+                  const targetId = targetHref;
+                  const targetElement = document.querySelector(targetId);
+                  if (targetElement) {
+                    if (
+                      mobileMenu &&
+                      !mobileMenu.classList.contains("hidden") &&
+                      this.classList.contains("mobile-nav-link")
+                    ) {
+                      mobileMenu.classList.add("hidden");
+                    }
+                    if (
+                      cartOverlay.classList.contains("active") &&
+                      (this.classList.contains("nav-link-footer") ||
+                        this.classList.contains("nav-link"))
+                    ) {
+                      closeCart();
+                    }
+                    window.scrollTo({
+                      top: targetElement.offsetTop - 80,
+                      behavior: "smooth",
+                    });
+                  }
+                } else if (
+                  targetHref.startsWith("#") &&
+                  currentPath === "menu-lengkap.html"
+                ) {
+                  e.preventDefault();
+                  const targetElement = document.querySelector(targetHref);
+                  if (targetElement) {
+                    window.scrollTo({
+                      top: targetElement.offsetTop - 80,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+              } else if (targetHref && targetHref !== "#") {
+                // Make sure it's not just a placeholder href="#"
+                if (
+                  mobileMenu &&
+                  !mobileMenu.classList.contains("hidden") &&
+                  this.classList.contains("mobile-nav-link")
+                ) {
+                  mobileMenu.classList.add("hidden");
+                }
+                if (
+                  cartOverlay.classList.contains("active") &&
+                  (this.classList.contains("nav-link-footer") ||
+                    this.classList.contains("nav-link"))
+                ) {
+                  closeCart();
+                }
+              } else {
+                // If targetHref is null or just "#", prevent default to avoid jumping to top
+                e.preventDefault();
+              }
+            });
+          });
+      });
+    </script>
+  </body>
+</html>

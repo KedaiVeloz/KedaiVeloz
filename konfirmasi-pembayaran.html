@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Konfirmasi Pembayaran - Kedai Veloz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff9f0;
+      }
+      .nav-link {
+        position: relative;
+      }
+      .nav-link:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #8b4513;
+        transition: width 0.3s ease;
+      }
+      .nav-link:hover:after {
+        width: 100%;
+      }
+      .btn-primary {
+        background-color: #8b4513;
+        transition: all 0.3s ease;
+        border-radius: 50px;
+      }
+      .btn-primary:hover {
+        background-color: #a0522d;
+        transform: scale(1.05);
+      }
+
+      /* Styles for cart overlay (kept for header consistency if cart icon is used) */
+      #cartOverlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 400px;
+        height: 100%;
+        background-color: #fff9f0;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+      }
+      #cartOverlay.active {
+        transform: translateX(0);
+      }
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background-color: #ffffff;
+      }
+      .cart-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #8b4513;
+      }
+      #closeCartButton {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #8b4513;
+        cursor: pointer;
+      }
+      .cart-body {
+        flex-grow: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+      }
+      .cart-empty-message {
+        text-align: center;
+        color: #8b4513;
+        margin-top: 2rem;
+      }
+      .cart-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background-color: #ffffff;
+      }
+      .cart-subtotal {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #8b4513;
+        margin-bottom: 1rem;
+      }
+      .btn-checkout {
+        background-color: #8b4513;
+        color: white;
+        width: 100%;
+        padding: 0.75rem;
+        text-align: center;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      .btn-checkout:hover {
+        background-color: #a0522d;
+      }
+      @media (min-width: 768px) {
+        #cartOverlay {
+          width: 400px;
+        }
+      }
+
+      .status-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+      .status-waiting {
+        color: #fbbf24; /* amber-400 */
+      }
+      .status-success {
+        color: #34d399; /* emerald-400 */
+      }
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed #e5e7eb;
+      }
+      .detail-item:last-child {
+        border-bottom: none;
+      }
+      .detail-item span:first-child {
+        color: #4b5563; /* gray-600 */
+      }
+      .detail-item span:last-child {
+        font-weight: 500;
+        color: #1f2937; /* gray-800 */
+      }
+      .payment-instruction-box {
+        background-color: #fef3c7; /* amber-100 */
+        border-left: 4px solid #f59e0b; /* amber-500 */
+        padding: 1rem;
+        border-radius: 4px;
+        margin-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center">
+            <a href="veloz.html" class="flex items-center">
+              <img
+                src="logoveloz.png"
+                alt="Kedai Veloz Logo"
+                class="h-10 mr-3"
+              />
+              <h1 class="text-xl font-bold text-[#8B4513]">Kedai Veloz</h1>
+            </a>
+          </div>
+          <nav class="hidden md:flex space-x-8 items-center">
+            <a
+              href="veloz.html#home"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Home</a
+            >
+            <a
+              href="menu-lengkap.html"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Menu</a
+            >
+            <a
+              href="veloz.html#about"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Tentang</a
+            >
+            <button class="btn-primary text-white px-6 py-2 ml-4 btn-pesan">
+              <i class="fas fa-shopping-bag mr-2"></i>Keranjang
+            </button>
+          </nav>
+          <button
+            class="md:hidden text-gray-700 text-2xl"
+            id="mobileMenuButton"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="py-12 md:py-20">
+      <div class="container mx-auto px-4">
+        <div
+          class="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-xl text-center"
+        >
+          <div id="statusIconContainer">
+            <i class="fas fa-hourglass-half status-icon status-waiting"></i>
+          </div>
+          <h2
+            id="paymentStatusTitle"
+            class="text-2xl md:text-3xl font-bold text-[#8B4513] mb-3"
+          >
+            Menunggu Konfirmasi Pembayaran
+          </h2>
+          <p id="paymentStatusSubtitle" class="text-gray-600 mb-6">
+            Pesanan Anda telah kami terima. Silakan selesaikan pembayaran Anda.
+          </p>
+
+          <div class="border-t border-b py-4 my-6 text-left">
+            <h4 class="text-lg font-semibold text-[#8B4513] mb-3">
+              Detail Pesanan:
+            </h4>
+            <div id="orderDetailsSummary" class="space-y-1">
+              <div class="detail-item">
+                <span>ID Pesanan:</span><span id="orderIdConfirm">-</span>
+              </div>
+              <div class="detail-item">
+                <span>Total Pembayaran:</span
+                ><span id="totalAmountConfirm">-</span>
+              </div>
+              <div class="detail-item">
+                <span>Metode Pembayaran:</span
+                ><span id="paymentMethodConfirm">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="paymentInstructionsConfirm"
+            class="payment-instruction-box text-left"
+          >
+            <p class="font-semibold">
+              Mohon segera lakukan pembayaran agar pesanan Anda dapat diproses.
+            </p>
+          </div>
+
+          <div id="successMessage" class="hidden mt-6">
+            <p class="text-gray-700">
+              Terima kasih atas pembayaran Anda! Pesanan Anda akan segera kami
+              proses.
+            </p>
+            <a
+              href="veloz.html"
+              class="mt-6 inline-block btn-primary text-white px-8 py-3 rounded-md font-semibold"
+            >
+              Kembali ke Beranda
+            </a>
+          </div>
+          <input
+            type="file"
+            id="proofOfPaymentUpload"
+            accept="image/*"
+            style="display: none"
+          />
+          <button
+            id="sendProofButton"
+            class="hidden mt-6 btn-primary text-white px-8 py-3 rounded-md font-semibold w-full md:w-auto"
+          >
+            Kirim Bukti Pembayaran via WhatsApp
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-[#8B4513] text-white py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center mb-4">
+              <a href="veloz.html" class="flex items-center">
+                <img
+                  src="logoveloz.png"
+                  alt="Kedai Veloz Logo"
+                  class="h-20 mr-3"
+                />
+                <h3 class="text-xl font-bold">Kedai Veloz</h3>
+              </a>
+            </div>
+            <p class="text-[#F5DEB3]">
+              Cita rasa bakso pedas yang menggugah selera.
+            </p>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Menu Cepat</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="veloz.html#home"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="menu-lengkap.html"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Menu</a
+                >
+              </li>
+              <li>
+                <a
+                  href="veloz.html#about"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Tentang</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Hubungi Kami</h4>
+            <ul class="space-y-2">
+              <li class="flex items-center">
+                <i class="fas fa-map-marker-alt mr-3 text-[#F5DEB3]"></i>
+                <span
+                  >Jl. Raya Sembon No.7, Dusun Sembon, Karangrejo, Kec.
+                  Karangrejo, Kabupaten Tulungagung, Jawa Timur 66253</span
+                >
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-phone-alt mr-3 text-[#F5DEB3]"></i>
+                <span>+6289-8365-4638</span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+            <div class="flex space-x-4">
+              <a href="#" class="text-2xl text-[#F5DEB3] hover:text-white"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="#" class="text-2xl text-[#F5DEB3] hover:text-white"
+                ><i class="fab fa-tiktok"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-[#A0522D] mt-8 pt-8 text-center text-sm text-[#F5DEB3]"
+        >
+          <p>&copy; 2025 Kedai Veloz. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden"
+      id="mobileMenu"
+    >
+      <div class="absolute top-0 right-0 bottom-0 w-3/4 bg-white p-6">
+        <div class="flex justify-between items-center mb-8">
+          <a href="veloz.html" class="flex items-center">
+            <img src="logoveloz.png" alt="Kedai Veloz Logo" class="h-8 mr-2" />
+            <h3 class="text-lg font-bold text-[#8B4513]">Kedai Veloz</h3>
+          </a>
+          <button id="closeMobileMenu" class="text-2xl text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <nav class="space-y-6 mb-8">
+          <a
+            href="veloz.html#home"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Home</a
+          >
+          <a
+            href="menu-lengkap.html"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Menu</a
+          >
+          <a
+            href="veloz.html#about"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Tentang Kami</a
+          >
+        </nav>
+        <button
+          class="w-full bg-[#8B4513] text-white py-3 rounded-full font-semibold btn-pesan"
+        >
+          <i class="fas fa-shopping-bag mr-2"></i>Keranjang
+        </button>
+      </div>
+    </div>
+    <div id="cartOverlay">
+      <div class="cart-header">
+        <h3>Keranjang Anda</h3>
+        <button id="closeCartButton"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="cart-body">
+        <div class="cart-empty-message">
+          <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+          <p>Keranjang Anda masih kosong.</p>
+        </div>
+      </div>
+      <div class="cart-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal:</span><span id="cartOverlaySubtotal">Rp 0</span>
+        </div>
+        <a
+          href="pembayaran.html"
+          id="checkoutLink"
+          class="btn-checkout block text-center"
+          >Lanjut ke Pembayaran <i class="fas fa-arrow-right ml-2"></i
+        ></a>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- Basic UI Interactivity (Mobile Menu, Cart Overlay Toggle) ---
+        const mobileMenuButton = document.getElementById("mobileMenuButton");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const closeMobileMenuButton =
+          document.getElementById("closeMobileMenu");
+        const cartOverlay = document.getElementById("cartOverlay");
+        const openCartButtons = document.querySelectorAll(".btn-pesan");
+        const closeCartButton = document.getElementById("closeCartButton");
+        const cartOverlaySubtotalEl = document.getElementById(
+          "cartOverlaySubtotal"
+        );
+
+        if (mobileMenuButton)
+          mobileMenuButton.addEventListener("click", () =>
+            mobileMenu?.classList.remove("hidden")
+          );
+        if (closeMobileMenuButton)
+          closeMobileMenuButton.addEventListener("click", () =>
+            mobileMenu?.classList.add("hidden")
+          );
+
+        function openCart() {
+          cartOverlay?.classList.add("active");
+          const cartBody = cartOverlay.querySelector(".cart-body");
+          const cartEmptyMsg = cartOverlay.querySelector(".cart-empty-message");
+          if (cartBody && cartEmptyMsg) {
+            cartBody.innerHTML = ""; // Clear previous items
+            // Clone the empty message structure and append it
+            const clonedEmptyMsg = cartEmptyMsg.cloneNode(true);
+            cartBody.appendChild(clonedEmptyMsg);
+          }
+          if (cartOverlaySubtotalEl) cartOverlaySubtotalEl.textContent = "Rp 0";
+        }
+        function closeCart() {
+          cartOverlay?.classList.remove("active");
+        }
+        openCartButtons.forEach((btn) =>
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openCart();
+            mobileMenu?.classList.add("hidden");
+          })
+        );
+        if (closeCartButton)
+          closeCartButton.addEventListener("click", closeCart);
+
+        // --- Payment Confirmation Logic ---
+        const statusIconContainer = document.getElementById(
+          "statusIconContainer"
+        );
+        const paymentStatusTitle =
+          document.getElementById("paymentStatusTitle");
+        const paymentStatusSubtitle = document.getElementById(
+          "paymentStatusSubtitle"
+        );
+        const orderIdConfirmEl = document.getElementById("orderIdConfirm");
+        const totalAmountConfirmEl =
+          document.getElementById("totalAmountConfirm");
+        const paymentMethodConfirmEl = document.getElementById(
+          "paymentMethodConfirm"
+        );
+        const paymentInstructionsConfirmEl = document.getElementById(
+          "paymentInstructionsConfirm"
+        );
+        const sendProofButton = document.getElementById("sendProofButton");
+        // const proofOfPaymentUploadInput = document.getElementById("proofOfPaymentUpload"); // Tidak lagi digunakan untuk event listener utama
+
+        const orderDetails = JSON.parse(
+          localStorage.getItem("currentOrderDetails")
+        );
+
+        if (orderDetails) {
+          orderIdConfirmEl.textContent = orderDetails.orderId;
+          totalAmountConfirmEl.textContent = orderDetails.totalAmount;
+          paymentMethodConfirmEl.textContent = orderDetails.paymentMethodName;
+
+          let instructions = `<p class="font-semibold mb-2">Instruksi Pembayaran (${orderDetails.paymentMethodName}):</p>`;
+          if (orderDetails.paymentMethod === "bri") {
+            instructions += `<p>Silakan transfer sejumlah <strong>${orderDetails.totalAmount}</strong> ke rekening Bank BRI:</p>
+                           <p>No. Rekening: <strong>123-456-7890</strong></p>
+                           <p>Atas Nama: <strong>Kedai Veloz</strong></p>`;
+          } else if (orderDetails.paymentMethod === "qris") {
+            instructions += `<p>Silakan scan QRIS di bawah ini dengan aplikasi pembayaran Anda untuk membayar sejumlah <strong>${orderDetails.totalAmount}</strong>.</p>
+                           <img src="qris.png" alt="QRIS Code" class="mx-auto my-2 border rounded w-32 h-32 sm:w-40 sm:h-40 object-contain">`;
+          } else if (orderDetails.paymentMethod === "bca") {
+            instructions += `<p>Silakan transfer sejumlah <strong>${orderDetails.totalAmount}</strong> ke rekening Bank BCA:</p>
+                           <p>No. Rekening: <strong>098-765-4321</strong></p>
+                           <p>Atas Nama: <strong>Kedai Veloz</strong></p>`;
+          }
+          instructions += `<p class="mt-3 text-sm">Setelah melakukan pembayaran, silakan klik tombol "Kirim Bukti Pembayaran via WhatsApp" di bawah ini. Anda akan diarahkan ke WhatsApp untuk mengirimkan bukti transfer Anda.JANGAN LUPA SERTAKAN BUKTI PEMBAYARAN BERSAMAAN DENGAN NOTA/DETAIL PESANAN ANDA</p>`;
+          paymentInstructionsConfirmEl.innerHTML = instructions;
+
+          if (sendProofButton) sendProofButton.classList.remove("hidden"); //
+
+          if (sendProofButton) {
+            //
+            sendProofButton.addEventListener("click", function () {
+              //
+              // Nomor WhatsApp tujuan
+              // Pastikan formatnya internasional tanpa spasi atau simbol, diawali dengan kode negara (62 untuk Indonesia)
+              const nomorWhatsApp = "628983654638"; // Nomor WA Kedai Veloz, sudah diformat.
+
+              // Membuat pesan WhatsApp
+              let pesanWhatsApp = `Halo Kedai Veloz,\n\nSaya ingin mengirimkan bukti pembayaran untuk pesanan dengan detail berikut:\nID Pesanan: *${orderDetails.orderId}*\nTotal Pembayaran: *${orderDetails.totalAmount}*\nMetode Pembayaran: *${orderDetails.paymentMethodName}*\n\n\n\nTerima kasih.`; //
+
+              const urlWhatsApp = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(
+                pesanWhatsApp
+              )}`; //
+
+              window.open(urlWhatsApp, "_blank"); // Membuka tab baru ke WhatsApp //
+            });
+          }
+        } else {
+          // Logika jika orderDetails tidak ditemukan
+          paymentStatusTitle.textContent = "Data Pesanan Tidak Ditemukan";
+          paymentStatusSubtitle.textContent =
+            "Silakan ulangi proses pemesanan Anda.";
+          paymentInstructionsConfirmEl.innerHTML =
+            "<p>Detail pesanan tidak dapat dimuat. Mohon coba lagi.</p>";
+          if (orderIdConfirmEl) orderIdConfirmEl.textContent = "-";
+          if (totalAmountConfirmEl) totalAmountConfirmEl.textContent = "-";
+          if (paymentMethodConfirmEl) paymentMethodConfirmEl.textContent = "-";
+          if (sendProofButton) sendProofButton.classList.add("hidden");
+        }
+
+        // HAPUS FUNGSI changeToSuccessStatus() dan panggilannya
+        // function changeToSuccessStatus() { ... }
+        // clearTimeout(timeoutId);
+
+        // Navigasi link (tetap sama)
+        document
+          .querySelectorAll(
+            "a.mobile-nav-link, a.nav-link-footer, nav a.nav-link"
+          )
+          .forEach((anchor) => {
+            anchor.addEventListener("click", function (e) {
+              const targetHref = this.getAttribute("href");
+              if (
+                targetHref &&
+                (targetHref.startsWith("veloz.html#") ||
+                  targetHref.startsWith("menu-lengkap.html#") ||
+                  targetHref === "veloz.html" ||
+                  targetHref === "menu-lengkap.html")
+              ) {
+                // Biarkan navigasi default
+              } else if (targetHref && targetHref.startsWith("#")) {
+                e.preventDefault();
+                const targetId = targetHref.substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                  window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: "smooth",
+                  });
+                }
+              }
+              if (
+                mobileMenu &&
+                !mobileMenu.classList.contains("hidden") &&
+                this.classList.contains("mobile-nav-link")
+              ) {
+                mobileMenu.classList.add("hidden");
+              }
+              if (
+                cartOverlay &&
+                cartOverlay.classList.contains("active") &&
+                (this.classList.contains("nav-link-footer") ||
+                  this.classList.contains("nav-link"))
+              ) {
+                closeCart();
+              }
+            });
+          });
+      });
+    </script>
+  </body>
+</html>
