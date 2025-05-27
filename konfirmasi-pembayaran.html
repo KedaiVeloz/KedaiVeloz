@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Konfirmasi Pembayaran</title>
+    <title>Konfirmasi Pembayaran - Kedai Veloz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -184,7 +184,7 @@
               >Menu</a
             >
             <a
-              href="index.html#tentang"
+              href="index.html#about"
               class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
               >Tentang</a
             >
@@ -313,7 +313,7 @@
               </li>
               <li>
                 <a
-                  href="index.html#tentang"
+                  href="index.html#about"
                   class="text-[#F5DEB3] hover:text-white nav-link-footer"
                   >Tentang</a
                 >
@@ -382,7 +382,7 @@
             >Menu</a
           >
           <a
-            href="index.html#tentang"
+            href="index.html#about"
             class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
             >Tentang Kami</a
           >
@@ -498,16 +498,16 @@
 
           let instructions = `<p class="font-semibold mb-2">Instruksi Pembayaran (${orderDetails.paymentMethodName}):</p>`;
           if (orderDetails.paymentMethod === "bri") {
-            instructions += `<p>Silakan transfer sejumlah <strong>${orderDetails.totalAmount}</strong> ke rekening Bank Jatim:</p>
-                           <p>No. Rekening: <strong>0153058938</strong></p>
-                           <p>Atas Nama: <strong>Retno Setyowati</strong></p>`;
+            instructions += `<p>Silakan transfer sejumlah <strong>${orderDetails.totalAmount}</strong> ke rekening Bank BRI:</p>
+                           <p>No. Rekening: <strong>123-456-7890</strong></p>
+                           <p>Atas Nama: <strong>Kedai Veloz</strong></p>`;
           } else if (orderDetails.paymentMethod === "qris") {
             instructions += `<p>Silakan scan QRIS di bawah ini dengan aplikasi pembayaran Anda untuk membayar sejumlah <strong>${orderDetails.totalAmount}</strong>.</p>
                            <img src="qris.png" alt="QRIS Code" class="mx-auto my-2 border rounded w-32 h-32 sm:w-40 sm:h-40 object-contain">`;
           } else if (orderDetails.paymentMethod === "bca") {
-            instructions += `<p>Silakan transfer sejumlah <strong>${orderDetails.totalAmount}</strong> ke rekening Bank BRI:</p>
-                           <p>No. Rekening: <strong>735801017397533</strong></p>
-                           <p>Atas Nama: <strong>ADYATMA PUTRA SUKO PRABALA</strong></p>`;
+            instructions += `<p>Silakan transfer sejumlah <strong>${orderDetails.totalAmount}</strong> ke rekening Bank BCA:</p>
+                           <p>No. Rekening: <strong>098-765-4321</strong></p>
+                           <p>Atas Nama: <strong>Kedai Veloz</strong></p>`;
           }
           instructions += `<p class="mt-3 text-sm">Setelah melakukan pembayaran, silakan klik tombol "Kirim Bukti Pembayaran via WhatsApp" di bawah ini. Anda akan diarahkan ke WhatsApp untuk mengirimkan bukti transfer Anda.JANGAN LUPA SERTAKAN BUKTI PEMBAYARAN BERSAMAAN DENGAN NOTA/DETAIL PESANAN ANDA</p>`;
           paymentInstructionsConfirmEl.innerHTML = instructions;
