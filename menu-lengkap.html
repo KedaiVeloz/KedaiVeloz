@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu Lengkap - Kedai Veloz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #fff9f0;
+      }
+
+      .product-card {
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .product-card .p-4 {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(139, 69, 19, 0.15);
+      }
+
+      .nav-link {
+        position: relative;
+      }
+      .nav-link.active-menu-link:after,
+      .nav-link:hover:after {
+        width: 100%;
+      }
+      .nav-link.active-menu-link {
+        color: #8b4513;
+        font-weight: 600;
+      }
+
+      .nav-link:not(.active-menu-link):after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #8b4513;
+        transition: width 0.3s ease;
+      }
+
+      .btn-primary {
+        background-color: #8b4513;
+        transition: all 0.3s ease;
+        border-radius: 50px;
+      }
+
+      .btn-primary:hover {
+        background-color: #a0522d;
+        transform: scale(1.05);
+      }
+
+      #cartOverlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 400px;
+        height: 100%;
+        background-color: #fff9f0;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #cartOverlay.active {
+        transform: translateX(0);
+      }
+
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background-color: #ffffff;
+      }
+
+      .cart-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #8b4513;
+      }
+
+      #closeCartButton {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #8b4513;
+        cursor: pointer;
+      }
+
+      .cart-body {
+        flex-grow: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+      }
+      .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0e6d8;
+      }
+      .cart-item img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 1rem;
+      }
+      .cart-item-details h4 {
+        font-weight: 600;
+        color: #8b4513;
+        font-size: 0.9rem;
+      }
+      .cart-item-details p {
+        font-size: 0.8rem;
+        color: #a0522d;
+      }
+      .cart-empty-message {
+        text-align: center;
+        color: #8b4513;
+        margin-top: 2rem;
+      }
+
+      .cart-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background-color: #ffffff;
+      }
+
+      .cart-subtotal {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #8b4513;
+        margin-bottom: 1rem;
+      }
+
+      .btn-checkout {
+        background-color: #8b4513;
+        color: white;
+        width: 100%;
+        padding: 0.75rem;
+        text-align: center;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-checkout:hover {
+        background-color: #a0522d;
+      }
+
+      .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        line-height: 1;
+      }
+      #mobileMenuButton .cart-badge {
+        top: 0px;
+        right: 0px;
+      }
+
+      @media (min-width: 768px) {
+        #cartOverlay {
+          width: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center">
+            <a href="index.html" class="flex items-center">
+              <img
+                src="logoveloz.png"
+                alt="Kedai Veloz Logo"
+                class="h-10 mr-3"
+              />
+              <h1 class="text-xl font-bold text-[#8B4513]">Kedai Veloz</h1>
+            </a>
+          </div>
+
+          <nav class="hidden md:flex space-x-8 items-center">
+            <a
+              href="index.html#home"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Home</a
+            >
+            <a
+              href="menu-lengkap.html"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513] active-menu-link"
+              >Menu</a
+            >
+            <a
+              href="index.html#about"
+              class="nav-link text-gray-700 font-medium hover:text-[#8B4513]"
+              >Tentang</a
+            >
+            <button
+              class="btn-primary text-white px-6 py-2 ml-4 btn-pesan relative"
+            >
+              <i class="fas fa-shopping-bag mr-2"></i>Keranjang
+              <span
+                id="cartItemCountBadgeHeader"
+                class="cart-badge"
+                style="display: none"
+                >0</span
+              >
+            </button>
+          </nav>
+
+          <button
+            class="md:hidden text-gray-700 text-2xl relative"
+            id="mobileMenuButton"
+          >
+            <i class="fas fa-bars"></i>
+            <span
+              id="cartItemCountBadgeHamburger"
+              class="cart-badge"
+              style="display: none"
+              >0</span
+            >
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section id="catalog" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold text-[#8B4513] mb-4">
+            Menu Lengkap Kami
+          </h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">
+            Jelajahi semua pilihan hidangan lezat dari Kedai Veloz.
+          </p>
+        </div>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
+        >
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod001"
+            data-name="Bakso Kuah Pedas"
+            data-price="8000"
+            data-image="bakso1.png"
+          >
+            <div class="relative">
+              <img
+                src="bakso1.png"
+                alt="Bakso Kuah Pedas"
+                class="w-full h-56 sm:h-64 object-cover"
+              />
+            </div>
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Pedas
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso yang diberi kuah pedas dengan bumbu bumbu rahasia kami
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 8.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod002"
+            data-name="Bakso Kuah Biasa"
+            data-price="8000"
+            data-image="bakso6.png"
+          >
+            <img
+              src="bakso6.png"
+              alt="Bakso Kuah Biasa"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Biasa
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso selayaknya bakso pada umumnya dengan bumbu dari kami
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 8.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod003"
+            data-name="Bakso Pedas Mie"
+            data-price="9000"
+            data-image="bakso2.png"
+          >
+            <img
+              src="bakso2.png"
+              alt="Bakso Pedas Mie"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Pedas Mie
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Pedas dengan tambahan Mie
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 9.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod004"
+            data-name="Bakso Kuah Biasa Mie"
+            data-price="9000"
+            data-image="bakso7.png"
+          >
+            <img
+              src="bakso7.png"
+              alt="Bakso Kuah Biasa Mie"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Biasa Mie
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Biasa dengan tambahan mie
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 9.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod005"
+            data-name="Bakso Kuah Pedas Tahu"
+            data-price="9000"
+            data-image="bakso3.png"
+          >
+            <img
+              src="bakso3.png"
+              alt="Bakso Kuah Pedas Tahu"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Pedas Tahu
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Pedas dengan tambahan Tahu
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 9.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod006"
+            data-name="Bakso Kuah Biasa Tahu"
+            data-price="9000"
+            data-image="bakso8.png"
+          >
+            <img
+              src="bakso8.png"
+              alt="Bakso Kuah Biasa Tahu"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Biasa Tahu
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Biasa dengan tambahan Tahu
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 9.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod007"
+            data-name="Bakso Kuah Pedas Mie Tahu"
+            data-price="10000"
+            data-image="bakso4.png"
+          >
+            <img
+              src="bakso4.png"
+              alt="Bakso Kuah Pedas Mie Tahu"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Pedas Mie Tahu
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Pedas dengan tambahan Mie dan Tahu
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 10.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod008"
+            data-name="Bakso Kuah Biasa Mie Tahu"
+            data-price="10000"
+            data-image="bakso9.png"
+          >
+            <img
+              src="bakso9.png"
+              alt="Bakso Kuah Biasa Mie Tahu"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Biasa Mie Tahu
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Biasa dengan tambahan Mie Tahu
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 10.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod009"
+            data-name="Bakso Kuah Pedas Komplit"
+            data-price="12000"
+            data-image="bakso5.png"
+          >
+            <img
+              src="bakso5.png"
+              alt="Bakso Kuah Pedas Komplit"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Pedas Komplit
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Pedas dengan topping Komplit
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 12.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod010"
+            data-name="Bakso Kuah Biasa Komplit"
+            data-price="12000"
+            data-image="bakso10.png"
+          >
+            <img
+              src="bakso10.png"
+              alt="Bakso Kuah Biasa Komplit"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Bakso Kuah Biasa Komplit
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Bakso Kuah Biasa dengan topping Komplit
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 12.000</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="product-card bg-[#FFF9F0] shadow-md"
+            data-id="prod011"
+            data-name="Tahu Mercon"
+            data-price="2500"
+            data-image="tahuisi.png"
+          >
+            <img
+              src="tahuisi.png"
+              alt="Tahu Mercon"
+              class="w-full h-56 sm:h-64 object-cover"
+            />
+            <div class="p-4 sm:p-6">
+              <div>
+                <h3 class="text-lg sm:text-xl font-bold text-[#8B4513] mb-2">
+                  Tahu Mercon
+                </h3>
+                <p
+                  class="text-gray-600 mb-3 text-xs sm:text-sm leading-relaxed h-16 sm:h-20 overflow-hidden"
+                >
+                  Tahu Goreng Krispi yang diisi dengan Selaian Daging Ayam
+                  dengan Bumbu Khas dari kami
+                </p>
+              </div>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-md sm:text-lg font-bold text-[#8B4513]"
+                  >Rp 2.500</span
+                >
+                <button
+                  class="bg-[#8B4513] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-[#A0522D] text-xs sm:text-sm btn-add-to-cart"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="bg-[#8B4513] text-white py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center mb-4">
+              <a href="index.html" class="flex items-center">
+                <img
+                  src="logoveloz.png"
+                  alt="Kedai Veloz Logo"
+                  class="h-20 mr-3"
+                />
+                <h3 class="text-xl font-bold">Kedai Veloz</h3>
+              </a>
+            </div>
+            <p class="text-[#F5DEB3]">
+              Cita rasa bakso pedas yang menggugah selera.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Menu Cepat</h4>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="index.html#home"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="menu-lengkap.html"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Menu</a
+                >
+              </li>
+              <li>
+                <a
+                  href="index.html#about"
+                  class="text-[#F5DEB3] hover:text-white nav-link-footer"
+                  >Tentang</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Hubungi Kami</h4>
+            <ul class="space-y-2">
+              <li class="flex items-center">
+                <i class="fas fa-map-marker-alt mr-3 text-[#F5DEB3]"></i>
+                <span
+                  >Jl. Raya Sembon No.7, Dusun Sembon, Karangrejo, Kec.
+                  Karangrejo, Kabupaten Tulungagung, Jawa Timur 66253</span
+                >
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-phone-alt mr-3 text-[#F5DEB3]"></i>
+                <span>+6289-8365-4638</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+            <div class="flex space-x-4">
+              <a href="#" class="text-2xl text-[#F5DEB3] hover:text-white">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="text-2xl text-[#F5DEB3] hover:text-white">
+                <i class="fab fa-tiktok"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-[#A0522D] mt-8 pt-8 text-center text-sm text-[#F5DEB3]"
+        >
+          <p>&copy; 2025 Kedai Veloz. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden"
+      id="mobileMenu"
+    >
+      <div class="absolute top-0 right-0 bottom-0 w-3/4 bg-white p-6">
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex items-center">
+            <a href="index.html" class="flex items-center">
+              <img
+                src="logoveloz.png"
+                alt="Kedai Veloz Logo"
+                class="h-8 mr-2"
+              />
+              <h3 class="text-lg font-bold text-[#8B4513]">Kedai Veloz</h3>
+            </a>
+          </div>
+          <button id="closeMobileMenu" class="text-2xl text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <nav class="space-y-6 mb-8">
+          <a
+            href="index.html#home"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Home</a
+          >
+          <a
+            href="menu-lengkap.html"
+            class="block text-lg font-semibold text-[#8B4513] mobile-nav-link"
+            >Menu</a
+          >
+          <a
+            href="index.html#about"
+            class="block text-lg font-semibold text-gray-700 hover:text-[#8B4513] mobile-nav-link"
+            >Tentang Kami</a
+          >
+        </nav>
+
+        <button
+          class="w-full bg-[#8B4513] text-white py-3 rounded-full font-semibold btn-pesan relative"
+        >
+          <i class="fas fa-shopping-bag mr-2"></i>Keranjang
+          <span
+            id="cartItemCountBadgeMobileMenu"
+            class="cart-badge"
+            style="display: none"
+            >0</span
+          >
+        </button>
+      </div>
+    </div>
+
+    <div id="cartOverlay">
+      <div class="cart-header">
+        <h3>Keranjang Anda</h3>
+        <button id="closeCartButton"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="cart-body">
+        <div class="cart-empty-message">
+          <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+          <p>Keranjang Anda masih kosong.</p>
+          <p class="text-sm text-gray-500">
+            Silakan tambahkan menu favorit Anda!
+          </p>
+        </div>
+      </div>
+      <div class="cart-footer">
+        <div class="cart-subtotal">
+          <span>Subtotal:</span>
+          <span id="cartOverlaySubtotal">Rp 0</span>
+        </div>
+        <a
+          href="pembayaran.html"
+          id="checkoutLink"
+          class="btn-checkout block text-center"
+        >
+          Lanjut ke Pembayaran <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </div>
+
+    <div
+      id="toastNotification"
+      class="fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-md shadow-lg z-[150]"
+      style="display: none"
+    >
+      Berhasil ditambahkan ke keranjang!
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuButton = document.getElementById("mobileMenuButton");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const closeMobileMenuButton =
+          document.getElementById("closeMobileMenu");
+
+        const cartOverlay = document.getElementById("cartOverlay");
+        const openCartButtons = document.querySelectorAll(".btn-pesan");
+        const closeCartButton = document.getElementById("closeCartButton");
+        const cartBody = cartOverlay.querySelector(".cart-body");
+        const cartSubtotalElement = cartOverlay.querySelector(
+          ".cart-subtotal span:last-child"
+        );
+        const cartEmptyMessageOriginal = cartOverlay.querySelector(
+          ".cart-empty-message"
+        );
+
+        const addToCartButtons = document.querySelectorAll(".btn-add-to-cart");
+        const toastNotification = document.getElementById("toastNotification");
+
+        const cartItemCountBadgeHeader = document.getElementById(
+          "cartItemCountBadgeHeader"
+        );
+        const cartItemCountBadgeMobileMenu = document.getElementById(
+          "cartItemCountBadgeMobileMenu"
+        );
+        const cartItemCountBadgeHamburger = document.getElementById(
+          "cartItemCountBadgeHamburger"
+        ); // Badge untuk hamburger
+
+        let cartItems = [];
+
+        if (localStorage.getItem("cartItemsVeloz")) {
+          cartItems = JSON.parse(localStorage.getItem("cartItemsVeloz"));
+        }
+
+        function saveCart() {
+          localStorage.setItem("cartItemsVeloz", JSON.stringify(cartItems));
+        }
+
+        function updateCartBadges() {
+          const totalQuantity = cartItems.reduce(
+            (sum, item) => sum + item.quantity,
+            0
+          );
+          const badges = [
+            cartItemCountBadgeHeader,
+            cartItemCountBadgeMobileMenu,
+            cartItemCountBadgeHamburger,
+          ]; // Ditambahkan cartItemCountBadgeHamburger
+
+          badges.forEach((badge) => {
+            if (badge) {
+              if (totalQuantity > 0) {
+                badge.textContent = totalQuantity;
+                badge.style.display = "flex";
+              } else {
+                badge.style.display = "none";
+              }
+            }
+          });
+        }
+
+        if (mobileMenuButton) {
+          mobileMenuButton.addEventListener("click", function () {
+            if (mobileMenu) mobileMenu.classList.remove("hidden");
+          });
+        }
+        if (closeMobileMenuButton) {
+          closeMobileMenuButton.addEventListener("click", function () {
+            if (mobileMenu) mobileMenu.classList.add("hidden");
+          });
+        }
+
+        function openCart() {
+          cartOverlay.classList.add("active");
+          renderCartItems();
+        }
+        function closeCart() {
+          cartOverlay.classList.remove("active");
+        }
+        openCartButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            event.stopPropagation();
+            openCart();
+            if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+              mobileMenu.classList.add("hidden");
+            }
+          });
+        });
+        if (closeCartButton) {
+          closeCartButton.addEventListener("click", closeCart);
+        }
+
+        function showToast(message) {
+          toastNotification.textContent = message;
+          toastNotification.style.display = "block";
+          setTimeout(() => {
+            toastNotification.style.display = "none";
+          }, 2000);
+        }
+
+        addToCartButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const card = this.closest(".product-card");
+            const productId = card.dataset.id;
+            const name = card.dataset.name;
+            const price = parseFloat(card.dataset.price);
+            const image = card.dataset.image;
+
+            addItemToCart(productId, name, price, image);
+            showToast("Berhasil ditambahkan ke keranjang!");
+          });
+        });
+
+        function addItemToCart(id, name, price, image) {
+          const existingItem = cartItems.find((item) => item.id === id);
+          if (existingItem) {
+            existingItem.quantity++;
+          } else {
+            cartItems.push({ id, name, price, image, quantity: 1 });
+          }
+          saveCart();
+          renderCartItems();
+          updateCartBadges();
+        }
+
+        function renderCartItems() {
+          cartBody.innerHTML = "";
+
+          if (cartItems.length === 0) {
+            if (cartEmptyMessageOriginal)
+              cartBody.appendChild(cartEmptyMessageOriginal.cloneNode(true));
+          } else {
+            cartItems.forEach((item) => {
+              const itemElement = document.createElement("div");
+              itemElement.classList.add(
+                "cart-item",
+                "flex",
+                "items-center",
+                "py-3",
+                "border-b",
+                "border-gray-200"
+              );
+              itemElement.innerHTML = `
+                        <img src="${item.image}" alt="${
+                item.name
+              }" class="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md mr-3 sm:mr-4">
+                        <div class="flex-grow">
+                            <h4 class="text-sm sm:text-md font-semibold text-[#8B4513]">${
+                              item.name
+                            }</h4>
+                            <p class="text-xs sm:text-sm text-gray-600">Rp ${item.price.toLocaleString(
+                              "id-ID"
+                            )}</p>
+                        </div>
+                        <div class="flex items-center mx-2 sm:mx-3">
+                            <button class="quantity-change bg-gray-200 text-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-l hover:bg-gray-300 text-xs sm:text-sm" data-id="${
+                              item.id
+                            }" data-change="-1">-</button>
+                            <span class="px-2 sm:px-3 text-sm sm:text-md">${
+                              item.quantity
+                            }</span>
+                            <button class="quantity-change bg-gray-200 text-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-r hover:bg-gray-300 text-xs sm:text-sm" data-id="${
+                              item.id
+                            }" data-change="1">+</button>
+                        </div>
+                        <button class="remove-item text-red-500 hover:text-red-700 text-md sm:text-lg" data-id="${
+                          item.id
+                        }">&times;</button>
+                    `;
+              cartBody.appendChild(itemElement);
+            });
+          }
+          updateCartSubtotal();
+          addCartItemEventListeners();
+          updateCartBadges();
+        }
+
+        function updateCartSubtotal() {
+          const subtotal = cartItems.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+          if (cartSubtotalElement)
+            cartSubtotalElement.textContent = `Rp ${subtotal.toLocaleString(
+              "id-ID"
+            )}`;
+        }
+
+        function addCartItemEventListeners() {
+          cartBody.querySelectorAll(".quantity-change").forEach((button) => {
+            button.addEventListener("click", function () {
+              const itemId = this.dataset.id;
+              const change = parseInt(this.dataset.change);
+              updateItemQuantity(itemId, change);
+            });
+          });
+
+          cartBody.querySelectorAll(".remove-item").forEach((button) => {
+            button.addEventListener("click", function () {
+              const itemId = this.dataset.id;
+              removeItemFromCart(itemId);
+            });
+          });
+        }
+
+        function updateItemQuantity(id, change) {
+          const itemIndex = cartItems.findIndex((item) => item.id === id);
+          if (itemIndex > -1) {
+            cartItems[itemIndex].quantity += change;
+            if (cartItems[itemIndex].quantity <= 0) {
+              cartItems.splice(itemIndex, 1);
+            }
+          }
+          saveCart();
+          renderCartItems();
+        }
+
+        function removeItemFromCart(id) {
+          cartItems = cartItems.filter((item) => item.id !== id);
+          saveCart();
+          renderCartItems();
+        }
+
+        renderCartItems();
+        updateCartBadges();
+
+        document
+          .querySelectorAll(
+            "a.mobile-nav-link, a.nav-link-footer, nav a.nav-link"
+          )
+          .forEach((anchor) => {
+            anchor.addEventListener("click", function (e) {
+              const targetHref = this.getAttribute("href");
+              const currentPath =
+                window.location.pathname.substring(
+                  window.location.pathname.lastIndexOf("/") + 1
+                ) || "index.html";
+
+              if (
+                targetHref.startsWith("#") ||
+                (targetHref.includes("#") &&
+                  targetHref.split("#")[0] === currentPath) ||
+                (targetHref.includes("#") &&
+                  targetHref.split("#")[0] === "" &&
+                  (currentPath === "index.html" || currentPath === ""))
+              ) {
+                // Logika ini spesifik untuk index.html atau jika halaman saat ini adalah menu-lengkap.html DAN targetnya adalah hash di menu-lengkap.html
+                if (
+                  ((currentPath === "index.html" || currentPath === "") &&
+                    (targetHref === "#home" ||
+                      targetHref === "#menu" ||
+                      targetHref === "#about")) ||
+                  (currentPath === "menu-lengkap.html" &&
+                    targetHref.startsWith("#")) // Jika di menu-lengkap dan linknya hash
+                ) {
+                  e.preventDefault();
+                  const targetId = targetHref.startsWith("#")
+                    ? targetHref
+                    : "#" + targetHref.split("#")[1];
+                  const targetElement = document.querySelector(targetId);
+                  if (targetElement) {
+                    if (
+                      mobileMenu &&
+                      !mobileMenu.classList.contains("hidden") &&
+                      this.classList.contains("mobile-nav-link")
+                    ) {
+                      mobileMenu.classList.add("hidden");
+                    }
+                    if (
+                      cartOverlay.classList.contains("active") &&
+                      (this.classList.contains("nav-link-footer") ||
+                        this.classList.contains("nav-link"))
+                    ) {
+                      closeCart();
+                    }
+                    window.scrollTo({
+                      top: targetElement.offsetTop - 80,
+                      behavior: "smooth",
+                    });
+                  }
+                }
+                // Jika tidak, biarkan navigasi default (misalnya, dari menu-lengkap.html ke index.html#about)
+              } else {
+                // Ini untuk link ke halaman lain (misal index.html#about dari menu-lengkap.html)
+                if (
+                  mobileMenu &&
+                  !mobileMenu.classList.contains("hidden") &&
+                  this.classList.contains("mobile-nav-link")
+                ) {
+                  mobileMenu.classList.add("hidden");
+                }
+                if (
+                  cartOverlay.classList.contains("active") &&
+                  (this.classList.contains("nav-link-footer") ||
+                    this.classList.contains("nav-link"))
+                ) {
+                  closeCart();
+                }
+                // Biarkan navigasi default browser untuk link ke halaman lain
+              }
+            });
+          });
+      });
+    </script>
+  </body>
+</html>
